@@ -226,14 +226,10 @@ build_prompt() {
   prompt_git_duet
   prompt_git
   prompt_hg
-  prompt_end
-}
-line_two() {
-  echo""
   prompt_status
   prompt_virtualenv
   prompt_context
   prompt_end
 }
 
-PROMPT='%{%f%b%k%}$(build_prompt)$(line_two) '
+PROMPT='%{%f%b%k%}$(build_prompt) '
