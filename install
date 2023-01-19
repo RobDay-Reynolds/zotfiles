@@ -16,14 +16,14 @@ install_prefs() {
 }
 
 install_omz() {
-  git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
+  git clone git@github.com:ohmyzsh/ohmyzsh.git ~/.ohmyzsh
   chsh -s /bin/zsh
 }
 
 install_powerline() {
   echo "Installing powerline fonts\n"
   pushd "$HOME/workspace"
-    git clone https://github.com/powerline/fonts.git powerline-fonts
+    git clone git@github.com:powerline/fonts.git powerline-fonts
     pushd powerline-fonts
       ./install.sh
     popd
@@ -33,7 +33,7 @@ install_powerline() {
 install_luan_vim() {
   echo "Installing luan's vimfiles\n"
   pushd "$HOME"
-    git clone https://github.com/luan/vimfiles.git .vim
+    git clone git@github.com:luan/vimfiles.git .vim
     pushd .vim
       ./install
     popd
@@ -42,7 +42,7 @@ install_luan_vim() {
 
 link_dotfiles() {
   ln -s "$ZOTFILES/.zshrc" "$HOME/.zshrc"
-  ln -s "$ZOTFILES/zagnoster.zsh-theme" "$HOME/.oh-my-zsh/themes/zagnoster.zsh-theme"
+  ln -s "$ZOTFILES/zagnoster.zsh-theme" "$HOME/.ohmyzsh/themes/zagnoster.zsh-theme"
   cp "$ZOTFILES/.gitconfig" "$HOME/.gitconfig"
 }
 

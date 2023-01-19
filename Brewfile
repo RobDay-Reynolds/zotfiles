@@ -23,5 +23,5 @@ cask 'spectacle'
 cask 'firefox'
 cask 'google-chrome'
 cask 'flycut'
-mas '1Password', id: 1333542190
+# mas '1Password', id: 1333542190
 mas 'Things 3', id: 904280696

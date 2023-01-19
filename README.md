@@ -3,7 +3,7 @@
 This repo contains three things:
 
 1. dotfiles (.zshrc, etc)
-1. scripts to install said dotfiles and their possible prerequisites (oh-my-zsh)
+1. scripts to install said dotfiles and their possible prerequisites (ohmyzsh)
 1. instructions for how to consume the above 2 things
 
 ## Usage
@@ -21,7 +21,7 @@ These dotfiles work best when dependencies are installed with brew wherever poss
 
 *Notes on ZSH*: these dotfiles assume that your shell is ZSH. While you can install
 them on a machine for which the primary login shell is `bash` they specifically target
-oh-my-zsh and zsh by installing a `.zshrc` file and omz themes. Furthermore, the shebang
+ohmyzsh and zsh by installing a `.zshrc` file and omz themes. Furthermore, the shebang
 of all scripts in this repo is `#!/bin/zsh`. Nothing will run without zsh installed.
 
 ### Installation
@@ -47,7 +47,7 @@ The install script will:
 * install the [git-duet](https://github.com/git-duet/git-duet) brew package
 * golang 1.6 via brew
 * iterm2 via `brew cask`
-* [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) *
+* [ohmyzsh](https://github.com/ohmyzsh/ohmyzsh) *
 * clone and install [powerline fonts](https://github.com/powerline/fonts)
 * add `git ci` as an alias for `git duet-commit`
 * overwrite the current `~/.zshrc` with one from this repo
