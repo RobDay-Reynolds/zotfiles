@@ -1,55 +1,72 @@
 #!/bin/zsh
 
 setup() {
-  ZOTFILES="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  ZOTFILES="${0:a:h}"
   brew update
 }
 
 install_prefs() {
   # Link and read iterm2 prefs
-  ln -s "$ZOTFILES/com.googlecode.iterm2.plist" "$HOME/Library/Preferences/com.googlecode.iterm2.plist"
+  ln -sf "$ZOTFILES/com.googlecode.iterm2.plist" "$HOME/Library/Preferences/com.googlecode.iterm2.plist"
   defaults read "$HOME/Library/Preferences/com.googlecode.iterm2.plist"
-
-  # Link and read Spectacle prefs
-  ln -s "$ZOTFILES/com.divisiblebyzero.Spectacle.plist" "$HOME/Library/Preferences/com.divisiblebyzero.Spectacle.plist"
-  defaults read "$HOME/Library/Preferences/com.divisiblebyzero.Spectacle.plist"
 }
 
 install_omz() {
-  git clone git@github.com:ohmyzsh/ohmyzsh.git ~/.ohmyzsh
+  if [ ! -d "$HOME/.ohmyzsh" ]; then
+    git clone git@github.com:ohmyzsh/ohmyzsh.git ~/.ohmyzsh
+  fi
   chsh -s /bin/zsh
 }
 
 install_powerline() {
-  echo "Installing powerline fonts\n"
+  echo "Installing powerline fonts"
   pushd "$HOME/workspace"
-    git clone git@github.com:powerline/fonts.git powerline-fonts
+    if [ ! -d "powerline-fonts" ]; then
+      git clone git@github.com:powerline/fonts.git powerline-fonts
+    fi
     pushd powerline-fonts
       ./install.sh
     popd
   popd
 }
 
+install_neovim_python() {
+  echo "Setting up neovim Python support"
+  local venv_dir="$HOME/.config/nvim/venv"
+  if [ ! -d "$venv_dir" ]; then
+    mkdir -p "$HOME/.config/nvim"
+    /opt/homebrew/bin/python3 -m venv "$venv_dir"
+  fi
+  "$venv_dir/bin/pip" install --upgrade pip pynvim
+
+  # Ensure init.vim points to the venv python
+  local init_vim="$HOME/.config/nvim/init.vim"
+  if [ -f "$init_vim" ]; then
+    if ! grep -q "python3_host_prog" "$init_vim"; then
+      echo "let g:python3_host_prog = expand('~/.config/nvim/venv/bin/python')" >> "$init_vim"
+    fi
+  else
+    mkdir -p "$HOME/.config/nvim"
+    echo "let g:python3_host_prog = expand('~/.config/nvim/venv/bin/python')" > "$init_vim"
+  fi
+}
+
 install_luan_vim() {
-  echo "Installing luan's vimfiles\n"
-  pushd "$HOME"
-    git clone git@github.com:luan/vimfiles.git .vim
-    pushd .vim
-      ./install
+  echo "Installing luan's vimfiles"
+  if [ ! -d "$HOME/.vim" ]; then
+    pushd "$HOME"
+      git clone git@github.com:luan/vimfiles.git .vim
+      pushd .vim
+        ./install
+      popd
     popd
-  popd
+  fi
 }
 
 link_dotfiles() {
-  ln -s "$ZOTFILES/.zshrc" "$HOME/.zshrc"
-  ln -s "$ZOTFILES/zagnoster.zsh-theme" "$HOME/.ohmyzsh/themes/zagnoster.zsh-theme"
+  ln -sf "$ZOTFILES/.zshrc" "$HOME/.zshrc"
+  ln -sf "$ZOTFILES/zagnoster.zsh-theme" "$HOME/.ohmyzsh/themes/zagnoster.zsh-theme"
   cp "$ZOTFILES/.gitconfig" "$HOME/.gitconfig"
-}
-
-install_neovim() {
-  ln -s /usr/local/bin/nvim /usr/local/bin/vim
-  source ~/.zshrc
-  pip3 install neovim
 }
 
 set_defaults() {
@@ -65,13 +82,10 @@ main() {
 
   install_prefs
   install_powerline
-  install_neovim
   install_omz
+  install_neovim_python
   link_dotfiles
   install_luan_vim
-
-#  ruby-install -L
-#  ruby-install ruby
 
   set_defaults
 }
