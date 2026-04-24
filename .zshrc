@@ -36,14 +36,8 @@ export FZF_DEFAULT_OPTS='--height 100%'
 
 # Homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
-
-# Powerline
-powerline-daemon -q
-POWERLINE_BASH_CONTINUATION=1
-POWERLINE_BASH_SELECT=1
-if [ -f "$(python3 -c 'import site; print(site.getsitepackages()[0])')/powerline/bindings/bash/powerline.sh" ]; then
-  source "$(python3 -c 'import site; print(site.getsitepackages()[0])')/powerline/bindings/bash/powerline.sh"
-fi
+# Ensure ~/.local/bin takes priority over Homebrew
+export PATH="$HOME/.local/bin:$PATH"
 
 # Nix
 if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
