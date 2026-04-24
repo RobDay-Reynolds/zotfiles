@@ -1,55 +1,33 @@
-# Dotfiles
+# Zotfiles
 
-This repo contains three things:
+Dotfiles for macOS (Apple Silicon).
 
-1. dotfiles (.zshrc, etc)
-1. scripts to install said dotfiles and their possible prerequisites (ohmyzsh)
-1. instructions for how to consume the above 2 things
+## Prerequisites
 
-## Usage
+* Xcode CLI tools: `xcode-select --install`
+* [Homebrew](https://brew.sh)
 
-For best results, install while listening to
-[The Cowboy Bebop OST](https://itunes.apple.com/us/album/cowboy-bebop-original-soundtrack/id489780131)
+## Installation
 
-### Prerequisites
-
-These dotfiles work best when dependencies are installed with brew wherever possible,
-`*` indicates the dependency is not available via brew.
-
-* xcode CLI tools (`xcode-select --install`) *
-* [homebrew](http://brew.sh)
-
-*Notes on ZSH*: these dotfiles assume that your shell is ZSH. While you can install
-them on a machine for which the primary login shell is `bash` they specifically target
-ohmyzsh and zsh by installing a `.zshrc` file and omz themes. Furthermore, the shebang
-of all scripts in this repo is `#!/bin/zsh`. Nothing will run without zsh installed.
-
-### Installation
-
-It is best to assume that the following paths are required as is unless a specific
-exception is noted.
-
-1. clone dotfiles:
-
-    ```bash
-    git clone git@github.com:zaksoup/dotfiles.git ~/workspace/dotfiles
-    ```
-1. run install script
-
-    ```bash
-    cd ~/workspace/dotfiles
-    ./install
-    ```
+```bash
+git clone git@github.com:zaksoup/dotfiles.git ~/workspace/dotfiles
+cd ~/workspace/dotfiles
+./install
+```
 
 The install script will:
 
-* install git via brew
-* install the [git-duet](https://github.com/git-duet/git-duet) brew package
-* golang 1.6 via brew
-* iterm2 via `brew cask`
-* [ohmyzsh](https://github.com/ohmyzsh/ohmyzsh) *
-* clone and install [powerline fonts](https://github.com/powerline/fonts)
-* add `git ci` as an alias for `git duet-commit`
-* overwrite the current `~/.zshrc` with one from this repo
-* install the "Zagnoster" ZSH theme (agnoster with git-duet support)
-* download and install the [Hybrid colorscheme](https://github.com/w0ng/vim-hybrid) for iTerm
+* Install packages via Homebrew Bundle (see `Brewfile`)
+* Install [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh)
+* Install [powerline fonts](https://github.com/powerline/fonts)
+* Set up neovim with Python support (pynvim in a dedicated venv)
+* Install [luan's vimfiles](https://github.com/luan/vimfiles)
+* Symlink `.zshrc` and the Zagnoster zsh theme (rainbow agnoster with git-duet)
+* Copy `.gitconfig`
+* Set keyboard repeat rate defaults
+
+## Git Duet
+
+[git-duet](https://github.com/git-duet/git-duet) is configured with `GIT_DUET_CO_AUTHORED_BY=1`,
+which adds `Co-authored-by` trailers via a `prepare-commit-msg` hook.
+Use regular `git commit` (aliased to `git ci`) — not `git duet-commit`.
