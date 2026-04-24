@@ -1,55 +1,30 @@
 # vim:ft=zsh ts=2 sw=2 sts=2
 #
-# agnoster's Theme - https://gist.github.com/3712874
-# A Powerline-inspired theme for ZSH
+# Zagnoster Theme - A rainbow Powerline-inspired theme for ZSH
+# Based on agnoster's Theme with git-duet support
 #
-# # README
-#
-# In order for this theme to render correctly, you will need a
-# [Powerline-patched font](https://github.com/Lokaltog/powerline-fonts).
-# Make sure you have a recent version: the code points that Powerline
-# uses changed in 2012, and older versions will display incorrectly,
-# in confusing ways.
-#
-# In addition, I recommend the
-# [Solarized theme](https://github.com/altercation/solarized/) and, if you're
-# using it on Mac OS X, [iTerm 2](http://www.iterm2.com/) over Terminal.app -
-# it has significantly better color fidelity.
-#
-# # Goals
-#
-# The aim of this theme is to only show you *relevant* information. Like most
-# prompts, it will only show git information when in a git working directory.
-# However, it goes a step further: everything from the current user and
-# hostname to whether the last call exited with an error to whether background
-# jobs are running in this shell will all be displayed automatically when
-# appropriate.
+# Requires a Powerline-patched font.
 
 ### Segment drawing
-# A few utility functions to make it easy and re-usable to draw segmented prompts
 
 CURRENT_BG='NONE'
 
-# Special Powerline characters
-
 () {
   local LC_ALL="" LC_CTYPE="en_US.UTF-8"
-  # NOTE: This segment separator character is correct.  In 2012, Powerline changed
-  # the code points they use for their special characters. This is the new code point.
-  # If this is not working for you, you probably have an old version of the
-  # Powerline-patched fonts installed. Download and install the new version.
-  # Do not submit PRs to change this unless you have reviewed the Powerline code point
-  # history and have new information.
-  # This is defined using a Unicode escape sequence so it is unambiguously readable, regardless of
-  # what font the user is viewing this source code in. Do not replace the
-  # escape sequence with a single literal character.
-  # Do not change this! Do not make it '\u2b80'; that is the old, wrong code point.
   SEGMENT_SEPARATOR=$'\ue0b0'
 }
 
-# Begin a segment
-# Takes two arguments, background and foreground. Both can be omitted,
-# rendering default background/foreground.
+# Rainbow color palette
+typeset -a RAINBOW_COLORS
+RAINBOW_COLORS=(red yellow green cyan blue magenta)
+RAINBOW_INDEX=1
+
+# Get next rainbow color and advance
+next_rainbow_color() {
+  REPLY=$RAINBOW_COLORS[$RAINBOW_INDEX]
+  RAINBOW_INDEX=$(( (RAINBOW_INDEX % ${#RAINBOW_COLORS[@]}) + 1 ))
+}
+
 prompt_segment() {
   local bg fg
   [[ -n $1 ]] && bg="%K{$1}" || bg="%k"
@@ -63,7 +38,16 @@ prompt_segment() {
   [[ -n $3 ]] && echo -n $3
 }
 
-# End the prompt, closing any open segments
+# Rainbow segment — auto-picks the next color in the cycle
+rainbow_segment() {
+  next_rainbow_color
+  local bg=$REPLY
+  # Use black text for light backgrounds, white for dark
+  local fg=black
+  [[ $bg == "blue" || $bg == "magenta" || $bg == "red" ]] && fg=white
+  prompt_segment $bg $fg "$1"
+}
+
 prompt_end() {
   if [[ -n $CURRENT_BG ]]; then
     echo -n " %{%k%F{$CURRENT_BG}%}$SEGMENT_SEPARATOR"
@@ -75,36 +59,30 @@ prompt_end() {
 }
 
 ### Prompt components
-# Each component will draw itself, and hide itself if no information needs to be shown
 
-# Context: user@hostname (who am I and where am I)
 prompt_context() {
   if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
-    prompt_segment black default "%(!.%{%F{yellow}%}.)%m"
+    rainbow_segment "%(!.%{%F{yellow}%}.)%m"
   fi
 }
 
 prompt_git_duet() {
   if $(git rev-parse --is-inside-work-tree >/dev/null 2>&1); then
-    prompt_segment cyan grey
-
     local author=$(git config duet.env.git-author-initials)
     local committer=$(git config duet.env.git-committer-initials)
-    if [[ -z $committer ]]; then
-      echo -n "${author}"
-    else
-      echo -n "${author} ${committer}"
+    if [[ -n $author ]]; then
+      local duet_str="${author}"
+      [[ -n $committer ]] && duet_str="${author} ${committer}"
+      rainbow_segment "$duet_str"
     fi
   fi
 }
 
-# Git: branch/detached head, dirty status
 prompt_git() {
-
   local PL_BRANCH_CHAR
   () {
     local LC_ALL="" LC_CTYPE="en_US.UTF-8"
-    PL_BRANCH_CHAR=$'\ue0a0'         # 
+    PL_BRANCH_CHAR=$'\ue0a0'
   }
   local ref dirty mode repo_path
   repo_path=$(git rev-parse --git-dir 2>/dev/null)
@@ -112,10 +90,13 @@ prompt_git() {
   if $(git rev-parse --is-inside-work-tree >/dev/null 2>&1); then
     dirty=$(parse_git_dirty)
     ref=$(git symbolic-ref HEAD 2> /dev/null) || ref="➦ $(git rev-parse --short HEAD 2> /dev/null)"
+
+    # Dirty repos get yellow (warning), clean repos get the next rainbow color
     if [[ -n $dirty ]]; then
       prompt_segment yellow black
     else
-      prompt_segment green black
+      next_rainbow_color
+      prompt_segment $REPLY black
     fi
 
     if [[ -e "${repo_path}/BISECT_LOG" ]]; then
@@ -157,58 +138,17 @@ prompt_git() {
   fi
 }
 
-prompt_hg() {
-  local rev status
-  if $(hg id >/dev/null 2>&1); then
-    if $(hg prompt >/dev/null 2>&1); then
-      if [[ $(hg prompt "{status|unknown}") = "?" ]]; then
-        # if files are not added
-        prompt_segment red white
-        st='±'
-      elif [[ -n $(hg prompt "{status|modified}") ]]; then
-        # if any modification
-        prompt_segment yellow black
-        st='±'
-      else
-        # if working copy is clean
-        prompt_segment green black
-      fi
-      echo -n $(hg prompt "☿ {rev}@{branch}") $st
-    else
-      st=""
-      rev=$(hg id -n 2>/dev/null | sed 's/[^-0-9]//g')
-      branch=$(hg id -b 2>/dev/null)
-      if `hg st | grep -q "^\?"`; then
-        prompt_segment red black
-        st='±'
-      elif `hg st | grep -q "^[MA]"`; then
-        prompt_segment yellow black
-        st='±'
-      else
-        prompt_segment green black
-      fi
-      echo -n "☿ $rev@$branch" $st
-    fi
-  fi
-}
-
-# Dir: current working directory
 prompt_dir() {
-  prompt_segment blue black '%~'
+  rainbow_segment '%~'
 }
 
-# Virtualenv: current working virtualenv
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
   if [[ -n $virtualenv_path && -n $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
-    prompt_segment blue black "(`basename $virtualenv_path`)"
+    rainbow_segment "(`basename $virtualenv_path`)"
   fi
 }
 
-# Status:
-# - was there an error
-# - am I root
-# - are there background jobs?
 prompt_status() {
   local symbols
   symbols=()
@@ -222,11 +162,11 @@ prompt_status() {
 ## Main prompt
 build_prompt() {
   RETVAL=$?
+  RAINBOW_INDEX=1
+  prompt_status
   prompt_dir
   prompt_git_duet
   prompt_git
-  prompt_hg
-  prompt_status
   prompt_virtualenv
   prompt_context
   prompt_end
