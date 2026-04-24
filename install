@@ -70,8 +70,8 @@ main() {
   link_dotfiles
   install_luan_vim
 
-  ruby-install -L
-  ruby-install ruby
+#  ruby-install -L
+#  ruby-install ruby
 
   set_defaults
 }

@@ -1,3 +1,4 @@
+export ZSH_DISABLE_COMPFIX=true
 # Path to your ohmyzsh installation.
 export ZSH=$HOME/.ohmyzsh
 
@@ -67,7 +68,7 @@ plugins=(git docker)
 
 # User configuration
 
-export PATH="/usr/local/bin:$GOPATH/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH="/Users/robday-reynolds/.local/bin:/Users/robday-reynolds/.cargo/bin:/Users/robday-reynolds/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:$GOPATH/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
 # export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
@@ -108,9 +109,25 @@ source /usr/local/opt/chruby/share/chruby/auto.sh
 # FZF stuff
 export FZF_DEFAULT_OPTS='--height 100%'
 
+eval $(/opt/homebrew/bin/brew shellenv)
+
 powerline-daemon -q
 POWERLINE_BASH_CONTINUATION=1
 POWERLINE_BASH_SELECT=1
 source /usr/local/lib/python3.10/site-packages/powerline/bindings/bash/powerline.sh
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+export INPUTS_BUCKET=kohls-file-apply-inputs-rdr
+export INPUT_FILES_PUB_SUB=kohls-file-apply-inputs-rdr-subscription
+
+eval "$(direnv hook zsh)"
+
+ # Nix
+ if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+    . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+ fi
+ # End Nix
+
+# source "$(brew --prefix)/opt/asdf/libexec/asdf.sh"
+
