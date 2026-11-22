@@ -20,8 +20,8 @@ The install script will:
 * Install packages via Homebrew Bundle (see `Brewfile`)
 * Install [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh)
 * Install [powerline fonts](https://github.com/powerline/fonts)
+* Install the [LazyVim starter](https://github.com/LazyVim/starter) into `~/.config/nvim`
 * Set up neovim with Python support (pynvim in a dedicated venv)
-* Install [luan's vimfiles](https://github.com/luan/vimfiles)
 * Symlink `.zshrc` and the Zagnoster zsh theme (rainbow agnoster with git-duet)
 * Copy `.gitconfig`
 * Set keyboard repeat rate defaults

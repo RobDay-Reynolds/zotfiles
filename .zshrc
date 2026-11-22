@@ -12,6 +12,7 @@ export GOPATH=$HOME/go
 
 # editor
 export EDITOR=nvim
+alias vim=nvim
 
 # Set name of the theme to load.
 export ZSH_THEME="zagnoster"
@@ -44,3 +45,7 @@ if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
   . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
 fi
 # End Nix
+
+export CLOUDSMITH_API_KEY=$(op read op://Employee/cloudsmith/api_key)
+export ANTHROPIC_API_KEY=$(op read "op://Employee/anthropic/key")
+export OPENAI_API_KEY=$(op read "op://Employee/openai/api_key")

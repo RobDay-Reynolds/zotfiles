@@ -30,6 +30,14 @@ install_powerline() {
   popd
 }
 
+install_lazyvim() {
+  echo "Installing LazyVim starter"
+  if [ ! -d "$HOME/.config/nvim" ]; then
+    git clone https://github.com/LazyVim/starter "$HOME/.config/nvim"
+    rm -rf "$HOME/.config/nvim/.git"
+  fi
+}
+
 install_neovim_python() {
   echo "Setting up neovim Python support"
   local venv_dir="$HOME/.config/nvim/venv"
@@ -39,27 +47,9 @@ install_neovim_python() {
   fi
   "$venv_dir/bin/pip" install --upgrade pip pynvim
 
-  # Ensure init.vim points to the venv python
-  local init_vim="$HOME/.config/nvim/init.vim"
-  if [ -f "$init_vim" ]; then
-    if ! grep -q "python3_host_prog" "$init_vim"; then
-      echo "let g:python3_host_prog = expand('~/.config/nvim/venv/bin/python')" >> "$init_vim"
-    fi
-  else
-    mkdir -p "$HOME/.config/nvim"
-    echo "let g:python3_host_prog = expand('~/.config/nvim/venv/bin/python')" > "$init_vim"
-  fi
-}
-
-install_luan_vim() {
-  echo "Installing luan's vimfiles"
-  if [ ! -d "$HOME/.vim" ]; then
-    pushd "$HOME"
-      git clone git@github.com:luan/vimfiles.git .vim
-      pushd .vim
-        ./install
-      popd
-    popd
+  local options_lua="$HOME/.config/nvim/lua/config/options.lua"
+  if [ -f "$options_lua" ] && ! grep -q "python3_host_prog" "$options_lua"; then
+    echo 'vim.g.python3_host_prog = vim.fn.expand("~/.config/nvim/venv/bin/python")' >> "$options_lua"
   fi
 }
 
@@ -83,9 +73,9 @@ main() {
   install_prefs
   install_powerline
   install_omz
+  install_lazyvim
   install_neovim_python
   link_dotfiles
-  install_luan_vim
 
   set_defaults
 }

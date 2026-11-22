@@ -12,6 +12,7 @@ brew 'awscli'
 brew 'direnv'
 brew 'node'
 brew 'ripgrep'
+brew 'fd'
 brew 'tig'
 
 # apps
