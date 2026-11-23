@@ -3,7 +3,7 @@ cask_args appdir: '/Applications'
 # devtools
 brew 'git'
 tap  'git-duet/tap'
-brew 'git-duet'
+brew 'git-duet/tap/git-duet', trusted: true
 brew 'go'
 brew 'neovim'
 brew 'python@3'
@@ -14,6 +14,7 @@ brew 'node'
 brew 'ripgrep'
 brew 'fd'
 brew 'tig'
+brew 'tree-sitter-cli'
 
 # apps
 cask 'iterm2'

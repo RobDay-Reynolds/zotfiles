@@ -6,16 +6,21 @@ setup() {
 }
 
 install_prefs() {
-  # Link and read iterm2 prefs
-  ln -sf "$ZOTFILES/com.googlecode.iterm2.plist" "$HOME/Library/Preferences/com.googlecode.iterm2.plist"
-  defaults read "$HOME/Library/Preferences/com.googlecode.iterm2.plist"
+  # macOS's preferences daemon no longer follows symlinks in ~/Library/Preferences,
+  # so point iTerm2 at this repo with its "load preferences from a custom folder" setting.
+  local link="$HOME/Library/Preferences/com.googlecode.iterm2.plist"
+  [ -L "$link" ] && rm "$link"
+  defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$ZOTFILES"
+  defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
 }
 
 install_omz() {
   if [ ! -d "$HOME/.ohmyzsh" ]; then
     git clone git@github.com:ohmyzsh/ohmyzsh.git ~/.ohmyzsh
   fi
-  chsh -s /bin/zsh
+  if [ "$(dscl . -read "/Users/$USER" UserShell | awk '{print $2}')" != "/bin/zsh" ]; then
+    chsh -s /bin/zsh
+  fi
 }
 
 install_powerline() {
@@ -24,33 +29,34 @@ install_powerline() {
     if [ ! -d "powerline-fonts" ]; then
       git clone git@github.com:powerline/fonts.git powerline-fonts
     fi
+    # ~/Library/Fonts isn't created on new macOS accounts until something needs it
+    mkdir -p "$HOME/Library/Fonts"
     pushd powerline-fonts
       ./install.sh
     popd
   popd
 }
 
-install_lazyvim() {
-  echo "Installing LazyVim starter"
-  if [ ! -d "$HOME/.config/nvim" ]; then
-    git clone https://github.com/LazyVim/starter "$HOME/.config/nvim"
-    rm -rf "$HOME/.config/nvim/.git"
+link_nvim() {
+  echo "Linking neovim config"
+  local target="$HOME/.config/nvim"
+  mkdir -p "$HOME/.config"
+  if [ -e "$target" ] && [ ! -L "$target" ]; then
+    local backup="$target.bak-$(date +%Y%m%d%H%M%S)"
+    echo "Moving existing $target to $backup"
+    mv "$target" "$backup"
   fi
+  ln -sfn "$ZOTFILES/nvim" "$target"
 }
 
 install_neovim_python() {
   echo "Setting up neovim Python support"
-  local venv_dir="$HOME/.config/nvim/venv"
+  local venv_dir="$HOME/.local/share/nvim/venv"
   if [ ! -d "$venv_dir" ]; then
-    mkdir -p "$HOME/.config/nvim"
+    mkdir -p "$(dirname "$venv_dir")"
     /opt/homebrew/bin/python3 -m venv "$venv_dir"
   fi
   "$venv_dir/bin/pip" install --upgrade pip pynvim
-
-  local options_lua="$HOME/.config/nvim/lua/config/options.lua"
-  if [ -f "$options_lua" ] && ! grep -q "python3_host_prog" "$options_lua"; then
-    echo 'vim.g.python3_host_prog = vim.fn.expand("~/.config/nvim/venv/bin/python")' >> "$options_lua"
-  fi
 }
 
 link_dotfiles() {
@@ -68,12 +74,11 @@ main() {
   setup
 
   brew bundle
-  brew link git --force
 
   install_prefs
   install_powerline
   install_omz
-  install_lazyvim
+  link_nvim
   install_neovim_python
   link_dotfiles
 
