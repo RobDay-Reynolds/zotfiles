@@ -35,6 +35,23 @@ install_powerline() {
       ./install.sh
     popd
   popd
+  register_fonts
+}
+
+# macOS doesn't always pick up fonts copied into a ~/Library/Fonts created after login,
+# so register them the way Font Book would.
+register_fonts() {
+  echo "Registering fonts in ~/Library/Fonts"
+  swift - <<'SWIFT'
+import CoreText
+import Foundation
+let dir = URL(fileURLWithPath: NSHomeDirectory() + "/Library/Fonts")
+let urls = ((try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)) ?? [])
+  .filter { ["ttf", "otf"].contains($0.pathExtension.lowercased()) }
+var registered = 0
+for url in urls where CTFontManagerRegisterFontsForURL(url as CFURL, .user, nil) { registered += 1 }
+print("Registered \(registered) new fonts")
+SWIFT
 }
 
 link_nvim() {

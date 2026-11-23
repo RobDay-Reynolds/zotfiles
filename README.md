@@ -22,7 +22,7 @@ The install script will:
 * Install [powerline fonts](https://github.com/powerline/fonts)
 * Symlink `nvim/` to `~/.config/nvim` ([LazyVim](https://www.lazyvim.org) plus luan-style bindings; see below)
 * Set up neovim with Python support (pynvim in a venv under `~/.local/share/nvim`)
-* Symlink `.zshrc` and the Zagnoster zsh theme (rainbow agnoster with git-duet)
+* Symlink `.zshrc` (which sources an untracked `~/.zshrc.local` for machine-specific settings like `OP_ACCOUNT`) and the Zagnoster zsh theme (rainbow agnoster with git-duet)
 * Copy `.gitconfig`
 * Set keyboard repeat rate defaults
 
@@ -54,3 +54,12 @@ stay on `<space>`; luan's bindings use a literal `,` prefix (see `nvim/lua/confi
 | `<C-\>` | Reverse `f`/`t` repeat (what `,` used to do) |
 
 Press `,` and wait to see the full list in which-key.
+
+## 1Password CLI
+
+`.zshrc` loads API keys with `op read` at shell startup. On a new machine:
+
+1. In the 1Password app, turn on **Settings → Developer → Integrate with 1Password CLI**.
+2. Give iTerm **Full Disk Access** (System Settings → Privacy & Security). Without it, macOS
+   blocks `op` from reaching the 1Password app and it reports "No accounts configured".
+3. If you're signed in to more than one account, set `OP_ACCOUNT` in `~/.zshrc.local`.

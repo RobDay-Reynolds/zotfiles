@@ -46,6 +46,15 @@ if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
 fi
 # End Nix
 
-export CLOUDSMITH_API_KEY=$(op read op://Employee/cloudsmith/api_key)
-export ANTHROPIC_API_KEY=$(op read "op://Employee/anthropic/key")
-export OPENAI_API_KEY=$(op read "op://Employee/openai/api_key")
+# Machine-specific settings that stay out of this public repo (e.g. OP_ACCOUNT)
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local
+
+# Secrets from 1Password (needs 1Password app > Settings > Developer > "Integrate with 1Password CLI").
+# Only read them when op can see an account; otherwise op stops startup with an interactive prompt.
+if command -v op >/dev/null && op account list --format=json </dev/null 2>/dev/null | grep -q '"url"'; then
+  export CLOUDSMITH_API_KEY=$(op read op://Employee/cloudsmith/api_key </dev/null)
+  export ANTHROPIC_API_KEY=$(op read "op://Employee/anthropic/key" </dev/null)
+  export OPENAI_API_KEY=$(op read "op://Employee/openai/api_key" </dev/null)
+elif command -v op >/dev/null; then
+  echo "1Password CLI can't see any accounts from this terminal; skipping API keys" >&2
+fi
