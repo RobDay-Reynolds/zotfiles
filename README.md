@@ -24,6 +24,7 @@ The install script will:
 * Set up neovim with Python support (pynvim in a venv under `~/.local/share/nvim`)
 * Symlink `.zshrc` (which sources an untracked `~/.zshrc.local` for machine-specific settings like `OP_ACCOUNT`) and the Zagnoster zsh theme (rainbow agnoster with git-duet)
 * Copy `.gitconfig`
+* Import Rectangle window-manager settings from `RectangleConfig.json` (first run only)
 * Set keyboard repeat rate defaults
 
 ## Git Duet
@@ -63,3 +64,9 @@ Press `,` and wait to see the full list in which-key.
 2. Give iTerm **Full Disk Access** (System Settings → Privacy & Security). Without it, macOS
    blocks `op` from reaching the 1Password app and it reports "No accounts configured".
 3. If you're signed in to more than one account, set `OP_ACCOUNT` in `~/.zshrc.local`.
+
+## Rectangle
+
+To update the tracked settings, open Rectangle → Settings → **Export** and save over
+`RectangleConfig.json` in this repo. `install` imports it only when Rectangle has no settings yet;
+to re-import on a configured machine use Rectangle → Settings → **Import**.

@@ -76,6 +76,26 @@ install_neovim_python() {
   "$venv_dir/bin/pip" install --upgrade pip pynvim
 }
 
+install_rectangle_config() {
+  # Rectangle imports RectangleConfig.json from Application Support on launch and then
+  # renames/removes it, so copy it there (a symlink would be consumed). Runs before launch.
+  local config="$ZOTFILES/RectangleConfig.json"
+  [ -f "$config" ] || return 0
+  if defaults read com.knollsoft.Rectangle >/dev/null 2>&1; then
+    echo "Rectangle already configured; skipping config import"
+  else
+    echo "Importing Rectangle config"
+    mkdir -p "$HOME/Library/Application Support/Rectangle"
+    cp "$config" "$HOME/Library/Application Support/Rectangle/RectangleConfig.json"
+  fi
+}
+
+launch_menubar_apps() {
+  # Menu-bar apps do nothing until launched once; each asks for Accessibility permission
+  open -a Rectangle
+  open -a Flycut
+}
+
 link_dotfiles() {
   ln -sf "$ZOTFILES/.zshrc" "$HOME/.zshrc"
   ln -sf "$ZOTFILES/zagnoster.zsh-theme" "$HOME/.ohmyzsh/themes/zagnoster.zsh-theme"
@@ -93,6 +113,8 @@ main() {
   brew bundle
 
   install_prefs
+  install_rectangle_config
+  launch_menubar_apps
   install_powerline
   install_omz
   link_nvim
