@@ -91,9 +91,11 @@ install_rectangle_config() {
 }
 
 launch_menubar_apps() {
-  # Menu-bar apps do nothing until launched once; each asks for Accessibility permission
+  # These apps do nothing until launched once. Rectangle and Flycut ask for
+  # Accessibility permission; OrbStack walks through its own setup (docker CLI, helper).
   open -a Rectangle
   open -a Flycut
+  open -a OrbStack
 }
 
 link_dotfiles() {

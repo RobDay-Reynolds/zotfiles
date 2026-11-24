@@ -19,6 +19,7 @@ brew 'just'
 
 # apps
 cask 'iterm2'
+cask 'orbstack'
 cask 'rectangle'
 cask 'firefox'
 cask 'google-chrome'
