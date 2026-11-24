@@ -15,6 +15,7 @@ brew 'ripgrep'
 brew 'fd'
 brew 'tig'
 brew 'tree-sitter-cli'
+brew 'just'
 
 # apps
 cask 'iterm2'

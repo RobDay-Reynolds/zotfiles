@@ -23,6 +23,9 @@ plugins=(git docker)
 # User configuration
 export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/opt/homebrew/bin:/opt/homebrew/sbin:$GOPATH/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
+# Homebrew (before oh-my-zsh so completions in Homebrew's site-functions, like just's, get loaded)
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 source $ZSH/oh-my-zsh.sh
 
 # Stuff that bugs C.J.
@@ -35,8 +38,6 @@ eval "$(direnv hook zsh)"
 export FZF_DEFAULT_OPTS='--height 100%'
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# Homebrew
-eval "$(/opt/homebrew/bin/brew shellenv)"
 # Ensure ~/.local/bin takes priority over Homebrew
 export PATH="$HOME/.local/bin:$PATH"
 
