@@ -16,6 +16,7 @@ brew 'fd'
 brew 'tig'
 brew 'tree-sitter-cli'
 brew 'just'
+brew 'gh'
 
 # apps
 cask 'iterm2'
